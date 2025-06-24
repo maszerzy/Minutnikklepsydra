@@ -9,17 +9,20 @@ function updateDisplay() {
   document.getElementById("secDisplay").textContent = String(seconds).padStart(2, '0');
 
   time = minutes * 60 + seconds;
-  initialTime = time;
-
-  const percent = initialTime === 0 ? 0 : (initialTime - time) / initialTime;
-  const topHeight = Math.max(0, 50 - percent * 50);
-  const bottomHeight = Math.min(50, percent * 50);
-  document.getElementById("sandTop").style.height = topHeight + "%";
-  document.getElementById("sandBottom").style.height = bottomHeight + "%";
+  if (initialTime === 0) {
+    document.getElementById("sandTop").style.height = "50%";
+    document.getElementById("sandBottom").style.height = "0%";
+  } else {
+    const percent = (initialTime - time) / initialTime;
+    const topHeight = 50 - (percent * 50);
+    const bottomHeight = percent * 50;
+    document.getElementById("sandTop").style.height = topHeight + "%";
+    document.getElementById("sandBottom").style.height = bottomHeight + "%";
+  }
 }
 
 function changeTime(unit, delta) {
-  if (interval) return; // Don't change during countdown
+  if (interval) return;
   if (unit === 'min') {
     minutes = Math.max(0, minutes + delta);
   } else {
@@ -56,4 +59,4 @@ function resetTimer() {
   updateDisplay();
 }
 
-updateDisplay();
+window.onload = updateDisplay;
