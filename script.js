@@ -9,7 +9,8 @@ function updateDisplay() {
   document.getElementById("secDisplay").textContent = String(seconds).padStart(2, '0');
 
   time = minutes * 60 + seconds;
-  if (initialTime === 0) {
+
+  if (initialTime === 0 || time === initialTime) {
     document.getElementById("sandTop").style.height = "50%";
     document.getElementById("sandBottom").style.height = "0%";
   } else {
