@@ -7,25 +7,33 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>⏱️ Minutnik z klepsydrą</h1>
-  <div id="display">00:00</div>
+  <h1>⏱️ Minutnik</h1>
+
+  <div id="display-controls">
+    <div class="unit">
+      <button onclick="changeTime('min', 1)">▲</button>
+      <div id="minDisplay">00</div>
+      <button onclick="changeTime('min', -1)">▼</button>
+    </div>
+    <span>:</span>
+    <div class="unit">
+      <button onclick="changeTime('sec', 1)">▲</button>
+      <div id="secDisplay">00</div>
+      <button onclick="changeTime('sec', -1)">▼</button>
+    </div>
+  </div>
 
   <div id="hourglass">
     <div class="sand-top" id="sandTop"></div>
     <div class="sand-bottom" id="sandBottom"></div>
   </div>
 
-  <div id="controls">
-    <button onclick="setTime(1)">1 min</button>
-    <button onclick="setTime(3)">3 min</button>
-    <button onclick="setTime(5)">5 min</button>
-    <button onclick="setTime(10)">10 min</button>
-  </div>
   <div id="actions">
     <button onclick="startTimer()">▶ Start</button>
     <button onclick="stopTimer()">⏸ Stop</button>
     <button onclick="resetTimer()">🔁 Reset</button>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>

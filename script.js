@@ -1,49 +1,47 @@
 let time = 0;
 let initialTime = 0;
 let interval = null;
+let minutes = 0;
+let seconds = 0;
 
 function updateDisplay() {
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  document.getElementById("display").textContent =
-    String(minutes).padStart(2, '0') + ":" + String(seconds).padStart(2, '0');
+  document.getElementById("minDisplay").textContent = String(minutes).padStart(2, '0');
+  document.getElementById("secDisplay").textContent = String(seconds).padStart(2, '0');
 
-  // Aktualizacja klepsydry
-  if (initialTime > 0) {
-    const percent = (initialTime - time) / initialTime;
-    const topHeight = Math.max(0, 50 - percent * 50);
-    const bottomHeight = Math.min(50, percent * 50);
-    document.getElementById("sandTop").style.height = topHeight + "%";
-    document.getElementById("sandBottom").style.height = bottomHeight + "%";
-  }
+  time = minutes * 60 + seconds;
+  initialTime = time;
+
+  const percent = initialTime === 0 ? 0 : (initialTime - time) / initialTime;
+  const topHeight = Math.max(0, 50 - percent * 50);
+  const bottomHeight = Math.min(50, percent * 50);
+  document.getElementById("sandTop").style.height = topHeight + "%";
+  document.getElementById("sandBottom").style.height = bottomHeight + "%";
 }
 
-function setTime(min) {
-  stopTimer();
-  time = min * 60;
-  initialTime = time;
+function changeTime(unit, delta) {
+  if (interval) return; // Don't change during countdown
+  if (unit === 'min') {
+    minutes = Math.max(0, minutes + delta);
+  } else {
+    seconds = Math.max(0, Math.min(59, seconds + delta));
+  }
   updateDisplay();
 }
 
 function startTimer() {
-  if (interval) return;
+  if (interval || (minutes === 0 && seconds === 0)) return;
+  time = minutes * 60 + seconds;
+  initialTime = time;
+
   interval = setInterval(() => {
     if (time > 0) {
       time--;
+      minutes = Math.floor(time / 60);
+      seconds = time % 60;
       updateDisplay();
     } else {
       clearInterval(interval);
       interval = null;
-      document.body.style.backgroundColor = "#fff";
-      let flashes = 6;
-      const flash = setInterval(() => {
-        document.body.style.backgroundColor = (flashes % 2 === 0) ? "#000" : "#fff";
-        flashes--;
-        if (flashes <= 0) {
-          clearInterval(flash);
-          document.body.style.backgroundColor = "#fff";
-        }
-      }, 300);
     }
   }, 1000);
 }
@@ -55,7 +53,6 @@ function stopTimer() {
 
 function resetTimer() {
   stopTimer();
-  time = initialTime;
   updateDisplay();
 }
 
