@@ -1,0 +1,54 @@
+body {
+  background: white;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+#display {
+  font-size: 4em;
+  margin: 20px 0;
+}
+
+button {
+  font-size: 1.2em;
+  margin: 5px;
+  padding: 10px 20px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#hourglass {
+  position: relative;
+  width: 60px;
+  height: 100px;
+  margin: 20px auto;
+  background: #000;
+  clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%, 40% 50%);
+  overflow: hidden;
+}
+
+.sand-top, .sand-bottom {
+  position: absolute;
+  width: 100%;
+  background: gold;
+}
+
+.sand-top {
+  top: 0;
+  height: 50%;
+  transition: height 1s linear;
+}
+
+.sand-bottom {
+  bottom: 0;
+  height: 0%;
+  transition: height 1s linear;
+}

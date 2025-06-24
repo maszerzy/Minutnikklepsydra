@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minutnik z klepsydrą</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>⏱️ Minutnik z klepsydrą</h1>
+  <div id="display">00:00</div>
+
+  <div id="hourglass">
+    <div class="sand-top" id="sandTop"></div>
+    <div class="sand-bottom" id="sandBottom"></div>
+  </div>
+
+  <div id="controls">
+    <button onclick="setTime(1)">1 min</button>
+    <button onclick="setTime(3)">3 min</button>
+    <button onclick="setTime(5)">5 min</button>
+    <button onclick="setTime(10)">10 min</button>
+  </div>
+  <div id="actions">
+    <button onclick="startTimer()">▶ Start</button>
+    <button onclick="stopTimer()">⏸ Stop</button>
+    <button onclick="resetTimer()">🔁 Reset</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
