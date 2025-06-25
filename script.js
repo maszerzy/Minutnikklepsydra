@@ -1,70 +1,112 @@
-let time = 0;
-let initialTime = 0;
-let interval = null;
-let minutes = 0;
-let seconds = 0;
 
-function updateDisplay() {
-  document.getElementById("minDisplay").textContent = String(minutes).padStart(2, '0');
-  document.getElementById("secDisplay").textContent = String(seconds).padStart(2, '0');
+let totalSeconds = 0;
+let remainingSeconds = 0;
+let timer = null;
 
-  time = minutes * 60 + seconds;
+const canvas = document.getElementById("hourglass");
+const ctx = canvas.getContext("2d");
 
-  if (initialTime === 0 || time === initialTime) {
-    document.getElementById("sandTop").setAttribute("y", "0");
-    document.getElementById("sandTop").setAttribute("height", "200");
-
-    document.getElementById("sandBottom").setAttribute("y", "400");
-    document.getElementById("sandBottom").setAttribute("height", "0");
-  } else {
-    const percent = (initialTime - time) / initialTime;
-    const topHeight = 200 - (percent * 200);
-    const bottomHeight = percent * 200;
-
-    document.getElementById("sandTop").setAttribute("y", 0 + (200 - topHeight));
-    document.getElementById("sandTop").setAttribute("height", topHeight);
-
-    document.getElementById("sandBottom").setAttribute("y", 400 - bottomHeight);
-    document.getElementById("sandBottom").setAttribute("height", bottomHeight);
-  }
-}
-
-function changeTime(unit, delta) {
-  if (interval) return;
-  if (unit === 'min') {
-    minutes = Math.max(0, minutes + delta);
-  } else {
-    seconds = Math.max(0, Math.min(59, seconds + delta));
-  }
-  updateDisplay();
+function adjustTime(unit, delta) {
+    const el = document.getElementById(unit);
+    let value = parseInt(el.textContent) + delta;
+    if (value < 0) value = 0;
+    el.textContent = value;
 }
 
 function startTimer() {
-  if (interval || (minutes === 0 && seconds === 0)) return;
-  time = minutes * 60 + seconds;
-  initialTime = time;
-
-  interval = setInterval(() => {
-    if (time > 0) {
-      time--;
-      minutes = Math.floor(time / 60);
-      seconds = time % 60;
-      updateDisplay();
-    } else {
-      clearInterval(interval);
-      interval = null;
-    }
-  }, 1000);
+    const minutes = parseInt(document.getElementById("minutes").textContent);
+    const seconds = parseInt(document.getElementById("seconds").textContent);
+    totalSeconds = minutes * 60 + seconds;
+    if (totalSeconds === 0) return;
+    remainingSeconds = totalSeconds;
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => {
+        if (remainingSeconds <= 0) {
+            clearInterval(timer);
+            timer = null;
+        } else {
+            remainingSeconds--;
+            drawHourglass();
+        }
+    }, 1000);
 }
 
 function stopTimer() {
-  clearInterval(interval);
-  interval = null;
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
 }
 
 function resetTimer() {
-  stopTimer();
-  updateDisplay();
+    stopTimer();
+    remainingSeconds = 0;
+    drawHourglass();
 }
 
-window.onload = updateDisplay;
+function drawHourglass() {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const topY = 100;
+    const bottomY = h - 100;
+    const middleY = h / 2;
+    const midX = w / 2;
+
+    // Ramka klepsydry (czarna)
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(midX - 80, topY);
+    ctx.lineTo(midX + 80, topY);
+    ctx.lineTo(midX - 80, bottomY);
+    ctx.lineTo(midX + 80, bottomY);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(midX - 80, topY);
+    ctx.lineTo(midX, middleY);
+    ctx.lineTo(midX + 80, topY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(midX - 80, bottomY);
+    ctx.lineTo(midX, middleY);
+    ctx.lineTo(midX + 80, bottomY);
+    ctx.stroke();
+
+    // Piasek - proporcje
+    const percent = totalSeconds === 0 ? 0 : 1 - remainingSeconds / totalSeconds;
+
+    // Piasek górny
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.moveTo(midX - 70, topY + 10);
+    ctx.lineTo(midX + 70, topY + 10);
+    ctx.lineTo(midX + 70 * (1 - percent), middleY - 5);
+    ctx.lineTo(midX - 70 * (1 - percent), middleY - 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // Piasek dolny
+    ctx.beginPath();
+    ctx.moveTo(midX - 70 * percent, middleY + 5);
+    ctx.lineTo(midX + 70 * percent, middleY + 5);
+    ctx.lineTo(midX + 70, bottomY - 10);
+    ctx.lineTo(midX - 70, bottomY - 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Strumień piasku
+    if (timer) {
+        ctx.beginPath();
+        ctx.moveTo(midX, middleY - 5);
+        ctx.lineTo(midX, middleY + 5);
+        ctx.stroke();
+    }
+}
+
+// Początkowy rysunek
+drawHourglass();
