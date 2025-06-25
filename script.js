@@ -1,112 +1,124 @@
 
-let totalSeconds = 0;
-let remainingSeconds = 0;
-let timer = null;
+window.onload = () => {
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+  const tileSize = canvas.width / 8;
+  let board = [];
+  let selected = null;
+  let currentPlayer = "white";
 
-const canvas = document.getElementById("hourglass");
-const ctx = canvas.getContext("2d");
+  function resetBoard() {
+    board = Array(8).fill().map(() => Array(8).fill(null));
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        if ((x + y) % 2 === 1 && y < 3) board[y][x] = { color: "black", king: false };
+        if ((x + y) % 2 === 1 && y > 4) board[y][x] = { color: "white", king: false };
+      }
+    }
+    selected = null;
+    updateScore();
+  }
 
-function adjustTime(unit, delta) {
-    const el = document.getElementById(unit);
-    let value = parseInt(el.textContent) + delta;
-    if (value < 0) value = 0;
-    el.textContent = value;
-}
+  function updateScore() {
+    let white = 0, black = 0;
+    for (let row of board)
+      for (let piece of row)
+        if (piece) (piece.color === "white" ? white++ : black++);
+    document.getElementById("scoreboard").textContent = `Białe: ${white} | Czarne: ${black}`;
+  }
 
-function startTimer() {
-    const minutes = parseInt(document.getElementById("minutes").textContent);
-    const seconds = parseInt(document.getElementById("seconds").textContent);
-    totalSeconds = minutes * 60 + seconds;
-    if (totalSeconds === 0) return;
-    remainingSeconds = totalSeconds;
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
-        if (remainingSeconds <= 0) {
-            clearInterval(timer);
-            timer = null;
-        } else {
-            remainingSeconds--;
-            drawHourglass();
+  function drawBoard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        ctx.fillStyle = (x + y) % 2 === 0 ? "#eee" : "#444";
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        const piece = board[y][x];
+        if (piece) {
+          ctx.beginPath();
+          ctx.arc(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize / 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = piece.color === "white" ? "#ccc" : "#222";
+          ctx.fill();
+
+          if (piece.king) {
+            ctx.strokeStyle = piece.color === "white" ? "#000" : "#fff";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x * tileSize + 12, y * tileSize + tileSize / 2);
+            ctx.lineTo(x * tileSize + tileSize - 12, y * tileSize + tileSize / 2);
+            ctx.stroke();
+          }
         }
-    }, 1000);
-}
 
-function stopTimer() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
+        if (selected && selected.x === x && selected.y === y) {
+          ctx.strokeStyle = "#0f0";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x * tileSize + 2, y * tileSize + 2, tileSize - 4, tileSize - 4);
+        }
+      }
     }
-}
+  }
 
-function resetTimer() {
-    stopTimer();
-    remainingSeconds = 0;
-    drawHourglass();
-}
+  function getMoves(x, y, piece) {
+    const dirs = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+    const moves = [];
 
-function drawHourglass() {
-    const w = canvas.width;
-    const h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-
-    const topY = 100;
-    const bottomY = h - 100;
-    const middleY = h / 2;
-    const midX = w / 2;
-
-    // Ramka klepsydry (czarna)
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(midX - 80, topY);
-    ctx.lineTo(midX + 80, topY);
-    ctx.lineTo(midX - 80, bottomY);
-    ctx.lineTo(midX + 80, bottomY);
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(midX - 80, topY);
-    ctx.lineTo(midX, middleY);
-    ctx.lineTo(midX + 80, topY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(midX - 80, bottomY);
-    ctx.lineTo(midX, middleY);
-    ctx.lineTo(midX + 80, bottomY);
-    ctx.stroke();
-
-    // Piasek - proporcje
-    const percent = totalSeconds === 0 ? 0 : 1 - remainingSeconds / totalSeconds;
-
-    // Piasek górny
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(midX - 70, topY + 10);
-    ctx.lineTo(midX + 70, topY + 10);
-    ctx.lineTo(midX + 70 * (1 - percent), middleY - 5);
-    ctx.lineTo(midX - 70 * (1 - percent), middleY - 5);
-    ctx.closePath();
-    ctx.fill();
-
-    // Piasek dolny
-    ctx.beginPath();
-    ctx.moveTo(midX - 70 * percent, middleY + 5);
-    ctx.lineTo(midX + 70 * percent, middleY + 5);
-    ctx.lineTo(midX + 70, bottomY - 10);
-    ctx.lineTo(midX - 70, bottomY - 10);
-    ctx.closePath();
-    ctx.fill();
-
-    // Strumień piasku
-    if (timer) {
-        ctx.beginPath();
-        ctx.moveTo(midX, middleY - 5);
-        ctx.lineTo(midX, middleY + 5);
-        ctx.stroke();
+    for (let [dx, dy] of dirs) {
+      for (let i = 1; i < (piece.king ? 8 : 2); i++) {
+        let nx = x + dx * i;
+        let ny = y + dy * i;
+        if (nx < 0 || ny < 0 || nx >= 8 || ny >= 8) break;
+        if (board[ny][nx]) {
+          if (board[ny][nx].color !== piece.color) {
+            let jx = nx + dx;
+            let jy = ny + dy;
+            if (jx >= 0 && jy >= 0 && jx < 8 && jy < 8 && !board[jy][jx])
+              moves.push({ x: jx, y: jy, capture: { x: nx, y: ny } });
+          }
+          break;
+        } else if (!piece.king && i === 1) {
+          moves.push({ x: nx, y: ny });
+        } else if (piece.king) {
+          moves.push({ x: nx, y: ny });
+        }
+      }
     }
-}
+    return moves;
+  }
 
-// Początkowy rysunek
-drawHourglass();
+  function handleClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / tileSize);
+    const y = Math.floor((e.clientY - rect.top) / tileSize);
+    if (selected) {
+      const piece = board[selected.y][selected.x];
+      const valid = getMoves(selected.x, selected.y, piece);
+      const move = valid.find(m => m.x === x && m.y === y);
+      if (move) {
+        if (move.capture) board[move.capture.y][move.capture.x] = null;
+        board[y][x] = piece;
+        board[selected.y][selected.x] = null;
+        if ((piece.color === "white" && y === 0) || (piece.color === "black" && y === 7)) piece.king = true;
+        currentPlayer = currentPlayer === "white" ? "black" : "white";
+        selected = null;
+        updateScore();
+        drawBoard();
+        return;
+      }
+    }
+    const piece = board[y][x];
+    if (piece && piece.color === currentPlayer) selected = { x, y };
+    else selected = null;
+    drawBoard();
+  }
+
+  document.getElementById("restart").addEventListener("click", () => {
+    resetBoard();
+    drawBoard();
+  });
+
+  canvas.addEventListener("click", handleClick);
+
+  resetBoard();
+  drawBoard();
+};
