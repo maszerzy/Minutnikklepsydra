@@ -3,19 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Minutnik z klepsydrą</title>
+  <title>Minutnik z Klepsydrą</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>⏱️ Minutnik</h1>
-
   <div id="display-controls">
     <div class="unit">
       <button onclick="changeTime('min', 1)">▲</button>
       <div id="minDisplay">00</div>
       <button onclick="changeTime('min', -1)">▼</button>
     </div>
-    <span>:</span>
     <div class="unit">
       <button onclick="changeTime('sec', 1)">▲</button>
       <div id="secDisplay">00</div>
@@ -23,15 +20,19 @@
     </div>
   </div>
 
-  <div id="hourglass">
-    <div class="sand-top" id="sandTop"></div>
-    <div class="sand-bottom" id="sandBottom"></div>
+  <div id="svgContainer">
+    <svg id="hourglass-svg" viewBox="0 0 200 400">
+      <polygon points="50,0 150,0 100,200" fill="#ccc"/>
+      <polygon points="50,400 150,400 100,200" fill="#ccc"/>
+      <rect id="sandTop" x="50" y="0" width="100" height="200" fill="#f4c542"/>
+      <rect id="sandBottom" x="50" y="400" width="100" height="0" fill="#f4c542"/>
+    </svg>
   </div>
 
   <div id="actions">
-    <button onclick="startTimer()">▶ Start</button>
-    <button onclick="stopTimer()">⏸ Stop</button>
-    <button onclick="resetTimer()">🔁 Reset</button>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="resetTimer()">Reset</button>
   </div>
 
   <script src="script.js"></script>

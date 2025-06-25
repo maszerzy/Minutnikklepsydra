@@ -1,29 +1,17 @@
-* {
-  box-sizing: border-box;
-}
 body {
-  background: white;
+  background: #fff;
   font-family: sans-serif;
   text-align: center;
   margin: 0;
   padding: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-}
-
-h1 {
-  margin: 10px 0;
 }
 
 #display-controls {
   display: flex;
   justify-content: center;
-  align-items: center;
   font-size: 2em;
-  margin: 10px;
-  gap: 10px;
+  margin-top: 10px;
+  gap: 20px;
 }
 
 .unit {
@@ -34,37 +22,19 @@ h1 {
 
 .unit button {
   font-size: 1em;
-  padding: 4px 8px;
+  padding: 6px 10px;
   margin: 2px 0;
 }
 
-#hourglass {
-  flex-grow: 1;
+#svgContainer {
+  width: 90%;
+  max-width: 300px;
+  margin: 20px auto;
+}
+
+#hourglass-svg {
   width: 100%;
-  max-width: 400px;
-  margin: 10px auto;
-  position: relative;
-  background: #000;
-  clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%, 40% 50%);
-  overflow: hidden;
-}
-
-.sand-top, .sand-bottom {
-  position: absolute;
-  width: 100%;
-  background: gold;
-}
-
-.sand-top {
-  top: 0;
-  height: 50%;
-  transition: height 1s linear;
-}
-
-.sand-bottom {
-  bottom: 0;
-  height: 0%;
-  transition: height 1s linear;
+  height: auto;
 }
 
 #actions {

@@ -11,14 +11,21 @@ function updateDisplay() {
   time = minutes * 60 + seconds;
 
   if (initialTime === 0 || time === initialTime) {
-    document.getElementById("sandTop").style.height = "50%";
-    document.getElementById("sandBottom").style.height = "0%";
+    document.getElementById("sandTop").setAttribute("y", "0");
+    document.getElementById("sandTop").setAttribute("height", "200");
+
+    document.getElementById("sandBottom").setAttribute("y", "400");
+    document.getElementById("sandBottom").setAttribute("height", "0");
   } else {
     const percent = (initialTime - time) / initialTime;
-    const topHeight = 50 - (percent * 50);
-    const bottomHeight = percent * 50;
-    document.getElementById("sandTop").style.height = topHeight + "%";
-    document.getElementById("sandBottom").style.height = bottomHeight + "%";
+    const topHeight = 200 - (percent * 200);
+    const bottomHeight = percent * 200;
+
+    document.getElementById("sandTop").setAttribute("y", 0 + (200 - topHeight));
+    document.getElementById("sandTop").setAttribute("height", topHeight);
+
+    document.getElementById("sandBottom").setAttribute("y", 400 - bottomHeight);
+    document.getElementById("sandBottom").setAttribute("height", bottomHeight);
   }
 }
 
